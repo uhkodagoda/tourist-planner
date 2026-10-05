@@ -4,9 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import api from '../api.js';
 import { useAuth } from '../AuthContext.jsx';
 
-const DEMO_USERNAME = 'admin';
-const DEMO_PASSWORD = 'Admin@123';
-
 export default function AdminLogin() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -14,7 +11,6 @@ export default function AdminLogin() {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [copied, setCopied] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -32,12 +28,6 @@ export default function AdminLogin() {
     } finally {
       setLoading(false);
     }
-  }
-
-  function handleCopyDemo() {
-    navigator.clipboard.writeText(`${DEMO_USERNAME} / ${DEMO_PASSWORD}`);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
   }
 
   return (
@@ -126,18 +116,6 @@ export default function AdminLogin() {
               )}
             </button>
           </form>
-
-          <div className="login-demo">
-            <div className="login-demo-header">
-              <span><Icon name="key" size={14} className="icon-lead" />Demo credentials</span>
-              <button type="button" className="login-demo-copy" onClick={handleCopyDemo}>
-                {copied ? 'Copied!' : 'Copy'}
-              </button>
-            </div>
-            <div className="login-demo-body">
-              <code>{DEMO_USERNAME}</code> / <code>{DEMO_PASSWORD}</code>
-            </div>
-          </div>
         </div>
       </div>
 
