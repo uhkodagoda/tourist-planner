@@ -52,7 +52,7 @@ export default function PlaceCard({ place }) {
         <div className="place-meta">
           <span>{Number(place.distance_km).toFixed(1)} km from Bokundara</span>
           <span className="travel-time"><Icon name="car" size={14} className="icon-lead" />{estimateTravelTime(place.distance_km)}</span>
-          {!place.is_verified && <span className="unverified-flag">&middot; approximate</span>}
+          {!place.is_verified && <span className="unverified-flag">approximate</span>}
         </div>
         <p className="desc">
           {place.description.length > 120
