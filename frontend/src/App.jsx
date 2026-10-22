@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar.jsx';
+import Footer from './components/Footer.jsx';
 import Explore from './pages/Explore.jsx';
 import PlaceDetail from './pages/PlaceDetail.jsx';
 import VisitPlan from './pages/VisitPlan.jsx';
@@ -16,7 +17,7 @@ function RequireAdmin({ children }) {
   return isAuthenticated ? children : <Navigate to="/admin/login" replace />;
 }
 
-// NEW: keeps the browser tab title in sync with whichever page is showing.
+// Keeps the browser tab title in sync with whichever page is showing.
 function usePageTitle() {
   const location = useLocation();
 
@@ -54,31 +55,27 @@ export default function App() {
     <AuthProvider>
       <PlanProvider>
         <ToastProvider>
-        <div className="app-shell">
-          <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
-          <main>
-            <Routes>
-              <Route path="/" element={<Explore />} />
-              <Route path="/places/:id" element={<PlaceDetail />} />
-              <Route path="/plan" element={<VisitPlan />} />
-              <Route path="/admin/login" element={<AdminLogin />} />
-              <Route
-                path="/admin"
-                element={
-                  <RequireAdmin>
-                    <AdminDashboard />
-                  </RequireAdmin>
-                }
-              />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </main>
-          <footer className="footer">
-            <span className="footer-brand">Bokundara Trails</span>
-            <p>Local Tourist Day-Visit Planner and Information System</p>
-            <p className="footer-note">ITE2953 Programming Group Project &mdash; University of Moratuwa</p>
-          </footer>
-        </div>
+          <div className="app-shell">
+            <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
+             <main className="main">
+              <Routes>
+                <Route path="/" element={<Explore />} />
+                <Route path="/places/:id" element={<PlaceDetail />} />
+                <Route path="/plan" element={<VisitPlan />} />
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route
+                  path="/admin"
+                  element={
+                    <RequireAdmin>
+                      <AdminDashboard />
+                    </RequireAdmin>
+                  }
+                />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
         </ToastProvider>
       </PlanProvider>
     </AuthProvider>

@@ -78,7 +78,7 @@ export default function MapView({ places, height = 300, title }) {
   const coords = points.map((p) => `${p.latitude},${p.longitude}`);
   const openInMapsUrl =
     points.length === 1
-      ? `https://www.google.com/maps/search/?api=1&query=${coords[0]}`
+        ? `https://www.google.com/maps/search/${encodeURIComponent(points[0].name.replace(/\s*\(.*?\)\s*/g, ' ').trim())}/@${coords[0]},16z`
       : `https://www.google.com/maps/dir/?api=1&destination=${coords[coords.length - 1]}&waypoints=${coords.slice(0, -1).join('|')}&travelmode=driving`;
 
   return (
