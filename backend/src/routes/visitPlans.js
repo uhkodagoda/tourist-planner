@@ -3,11 +3,28 @@ const pool = require('../db');
 
 const router = express.Router();
 
+// Today's date as YYYY-MM-DD in the server's local time zone.
+function todayLocal() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 router.post('/', async (req, res) => {
   const { plan_name, planned_date, place_ids } = req.body;
 
   if (!Array.isArray(place_ids) || place_ids.length === 0) {
     return res.status(400).json({ error: 'At least one place must be included in the visit plan.' });
+  }
+
+  
+  // The planned date is optional, but it must be a real date that is not in the past.
+  if (planned_date) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(planned_date) || Number.isNaN(Date.parse(planned_date))) {
+      return res.status(400).json({ error: 'The planned date is not a valid date.' });
+    }
+    if (planned_date < todayLocal()) {
+      return res.status(400).json({ error: 'The planned date cannot be in the past.' });
+    }
   }
 
   const conn = await pool.getConnection();

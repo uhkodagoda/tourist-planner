@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Icon from '../components/Icon.jsx';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import api from '../api.js';
 import MapView from '../components/MapView.jsx';
 import { usePlan } from '../PlanContext.jsx';
 import { useToast } from '../ToastContext.jsx';
 import { optimizeRoute } from '../utils/routeOptimizer.js';
+import { todayString, googleCalendarUrl, buildIcs, downloadIcs } from '../utils/calendar.js';
 
 export default function VisitPlan() {
   const { plan, removePlace, moveUp, moveDown, clearPlan, totalDistance, addPlace } = usePlan();
@@ -14,9 +15,35 @@ export default function VisitPlan() {
   const [plannedDate, setPlannedDate] = useState('');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(null);
+  const [savedInfo, setSavedInfo] = useState(null);
   const [error, setError] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const today = todayString();
+
+  // Open a shared link such as /plan?places=3,1,7 and rebuild that plan.
+  useEffect(() => {
+    const ids = (searchParams.get('places') || '').split(',').map(Number).filter((n) => Number.isInteger(n) && n > 0);
+    if (ids.length === 0) return;
+    api.get('/places')
+      .then((res) => {
+        const byId = new Map(res.data.map((p) => [p.place_id, p]));
+        ids.forEach((id) => { if (byId.has(id)) addPlace(byId.get(id)); });
+      })
+      .catch(() => {})
+      .finally(() => setSearchParams({}, { replace: true }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleSave() {
+    if (plannedDate && plannedDate < today) {
+      setError('Please choose today or a future date for your visit.');
+      return;
+    }
+    const snapshot = {
+      name: planName,
+      date: plannedDate,
+      stops: plan.map((p, i) => `${i + 1}. ${p.name} (${p.category}, ~${Number(p.distance_km).toFixed(1)} km from Bokundara)`)
+    };
     setSaving(true);
     setError(null);
     setSaved(null);
@@ -27,6 +54,7 @@ export default function VisitPlan() {
         place_ids: plan.map((p) => p.place_id)
       });
       setSaved(res.data);
+      setSavedInfo(snapshot);
       clearPlan();
       showToast('Visit plan saved!', 'success');
     } catch (err) {
@@ -64,6 +92,9 @@ export default function VisitPlan() {
   }
 
   if (saved) {
+    const info = savedInfo || { name: saved.plan_name, date: '', stops: [] };
+    const details = ['Day-visit plan from Bokundara Trails', '', ...info.stops].join('\n');
+    const eventTitle = info.name || 'My Bokundara Day Trip';
     return (
       <div className="empty-state">
         <h2>Plan saved!</h2>
@@ -71,6 +102,22 @@ export default function VisitPlan() {
           &ldquo;{saved.plan_name}&rdquo; is saved with a total distance of{' '}
           <strong>{Number(saved.total_distance_km).toFixed(1)} km</strong>.
         </p>
+        {info.date ? (
+          <>
+            <p>Planned for <strong>{new Date(`${info.date}T00:00:00`).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</strong>. Add it to your calendar so you do not forget:</p>
+            <div className="calendar-actions">
+              <a className="btn btn-outline" target="_blank" rel="noopener noreferrer" href={googleCalendarUrl({ title: eventTitle, date: info.date, details })}>
+                Google Calendar
+              </a>
+              <button type="button" className="btn btn-outline" onClick={() => downloadIcs('bokundara-day-trip.ics', buildIcs({ title: eventTitle, date: info.date, details }))}>
+                Download .ics file
+              </button>
+            </div>
+            <p className="calendar-note">The .ics file works with Apple Calendar, Outlook and most phone calendars.</p>
+          </>
+        ) : (
+          <p className="calendar-note">Choose a planned date next time to add your plan to a calendar.</p>
+        )}
         <Link to="/" className="btn btn-gold">Plan another day</Link>
       </div>
     );
@@ -136,7 +183,7 @@ export default function VisitPlan() {
               </div>
               <div className="field">
                 <label htmlFor="plan-date">Planned date (optional)</label>
-                <input id="plan-date" type="date" value={plannedDate} onChange={(e) => setPlannedDate(e.target.value)} />
+                <input id="plan-date" type="date" min={today} value={plannedDate} onChange={(e) => setPlannedDate(e.target.value)} />
               </div>
               <button type="button" className="btn btn-gold" onClick={handleSave} disabled={saving}>
                 {saving ? 'Saving…' : 'Save visit plan'}

@@ -2580,3 +2580,7 @@ body.dark-mode .skeleton-line { background: var(--line); }
 .field-hint { margin: 0.35rem 0 0; font-size: 0.8rem; color: var(--gray-500); max-width: 60ch; }
 .checkbox-field { display: flex; align-items: center; gap: 0.6rem; }
 .checkbox-field input { width: auto; }
+
+/* Saved plan: add-to-calendar buttons */
+.calendar-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin: 0.25rem 0 0.75rem; }
+.calendar-note { font-size: 0.85rem; color: var(--gray-500); margin: 0 auto 1.5rem; }
