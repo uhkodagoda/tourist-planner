@@ -75,6 +75,7 @@ export default function Explore() {
         </div>
       </div>
 
+      
       <h2 className="section-heading">Explore by category</h2>
       <CategoryFilter active={category} onChange={setCategory} counts={counts} total={allPlaces.length} />
 
