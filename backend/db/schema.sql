@@ -58,3 +58,27 @@ CREATE TABLE IF NOT EXISTS admins (
   password_hash VARCHAR(255) NOT NULL,
   created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- ------------------------------------------------------------
+-- Table: reviews (visitor reviews and star ratings per place)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS reviews (
+  review_id     INT AUTO_INCREMENT PRIMARY KEY,
+  place_id      INT NOT NULL,
+  reviewer_name VARCHAR(100) NOT NULL,
+  rating        TINYINT NOT NULL,
+  comment       TEXT NOT NULL,
+  created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (place_id) REFERENCES places(place_id) ON DELETE CASCADE
+);
+
+-- ------------------------------------------------------------
+-- Table: place_photos (extra gallery photos added by the admin)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS place_photos (
+  photo_id    INT AUTO_INCREMENT PRIMARY KEY,
+  place_id    INT NOT NULL,
+  url         VARCHAR(500) NOT NULL,
+  uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (place_id) REFERENCES places(place_id) ON DELETE CASCADE
+);
