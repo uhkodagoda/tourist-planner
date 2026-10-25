@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Icon from './Icon.jsx';
 
 export default function Footer() {
   return (
@@ -18,7 +19,8 @@ export default function Footer() {
             <li><Link to="/">Explore places</Link></li>
             <li><Link to="/plan">My visit plan</Link></li>
             <li>
-              <a href="https://github.com/uhkodagoda/tourist-planner" target="_blank" rel="noopener noreferrer">
+              <a href="https://github.com/uhkodagoda/tourist-planner" target="_blank" rel="noopener noreferrer" className="footer-icon-link">
+                <Icon name="github" size={16} />
                 Source code
               </a>
             </li>

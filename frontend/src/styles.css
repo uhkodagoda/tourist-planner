@@ -2610,3 +2610,9 @@ body.dark-mode .skeleton-line { background: var(--line); }
   .lightbox-prev { left: 0.5rem; }
   .lightbox-next { right: 0.5rem; }
 }
+
+.footer-links a.footer-icon-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
